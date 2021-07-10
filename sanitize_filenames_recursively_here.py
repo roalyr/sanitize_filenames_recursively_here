@@ -168,7 +168,16 @@ def sanitize_recursively():
 				print()
 				src = os.path.join(root, entry)
 				dst = os.path.join(root, sanitized)
-				os.rename(src, dst)
+				# https://stackoverflow.com/questions/44506197/how-to-handle-oserror-errno-36-file-name-too-long
+				try:
+					os.rename(src, dst)
+				except OSError as exc:
+					if exc.errno == 36:
+						print(col.RED, "ERROR: Filename is too long, edit it manually (I don't know how to handle it).", col.ENDC)
+						print(col.RED, "File name was not changed", col.ENDC)
+					else:
+						raise  # re-raise previously caught exception
+
 				
 def sanitize_recursively_cold():
 	print()
